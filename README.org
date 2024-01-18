@@ -1,0 +1,4 @@
++ Uso
+ #+BEGIN_SRC sh
+   ./rpg [roll|r XdY]
+ #+END_SRC
