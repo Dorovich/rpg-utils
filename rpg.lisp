@@ -79,7 +79,7 @@
 (defun info (&optional game topic)
   "Buscar información sobre un tema concreto de un juego en concreto."
   (when (or (null game) (null topic))
-    (format t "Esta función necesita doc argumentos: nombre del juego, nombre del tema en concreto.~%")
+    (format t "Esta función necesita dos argumentos: nombre del juego, nombre del tema en concreto.~%")
     (return-from info))
   (format t "Buscando informacion sobre ~A del juego ~A...~%" topic game))
 
