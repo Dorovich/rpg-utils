@@ -41,12 +41,14 @@
 ;; Funciones de interfaz
 
 (defun repl ()
+  "Invoca un REPL. Por si se quieren poner muchos comandos a la vez."
   (let ((cmd (prompt-read ">")))
     (unless (string= cmd "exit")
       (main (delimiter-split #\Space cmd))
       (repl))))
 
 (defun roll (&optional expr)
+  "Tirar dados según la expresión XdY (X = cantidad, Y = caras) y calcular la suma de los resultados."
   (when (null expr)
     (format t "Esta función necesita un argumento: expresión de dados.~%")
     (return-from roll))
@@ -60,6 +62,7 @@
     (format t "~Dd~D => ~D~%" times faces result)))
 
 (defun coin (&optional times)
+  "Tirar X cantidad de monedas y hacer recuendo de la cantidad de caras y cruces."
   (when (null times)
     (format t "Esta función necesita un argumento: número de monedas.~%")
     (return-from coin))
@@ -73,11 +76,12 @@
                (incf heads)))
     (format t "~D monedas => ~D caras, ~D cruces~%" times heads tails)))
 
-(defun info (&optional game type name)
-  (when (or (null game) (null type) (null name))
-    (format t "Esta función necesita tres argumentos: nombre del juego, clase de información, nombre concreto del tipo.~%")
+(defun info (&optional game topic)
+  "Buscar información sobre un tema concreto de un juego en concreto."
+  (when (or (null game) (null topic))
+    (format t "Esta función necesita doc argumentos: nombre del juego, nombre del tema en concreto.~%")
     (return-from info))
-  (format t "Buscando informacion sobre ~A ~A del juego ~A...~%" name type game))
+  (format t "Buscando informacion sobre ~A del juego ~A...~%" topic game))
 
 ;; Inicio del programa
 
