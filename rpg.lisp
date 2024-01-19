@@ -6,6 +6,7 @@
                                  ("coin" . coin)
                                  ("c" . coin)
                                  ("info" . info)
+                                 ("i" . info)
                                  ))
 
 (defun main (args)
