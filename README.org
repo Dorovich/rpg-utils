@@ -7,6 +7,6 @@ Un conjunto de funciones para facilitar partidas de juegos de rol clásicos.
  #+END_SRC
 
  + =repl=: Invoca un REPL. Por si se quieren poner muchos comandos a la vez.
- + =roll=/=r=: Tirar dados según la expresión XdY (X = cantidad, Y = caras) y calcular la suma de los resultados.
- + =coin=/=c=: Tirar X cantidad de monedas y hacer recuendo de la cantidad de caras y cruces.
- + =info=/=i=: Buscar información sobre un tema concreto de un juego en concreto.
+ + =roll= / =r=: Tirar dados según la expresión XdY (X = cantidad, Y = caras) y calcular la suma de los resultados.
+ + =coin= / =c=: Tirar X cantidad de monedas y hacer recuendo de la cantidad de caras y cruces.
+ + =info= / =i=: Buscar información sobre un tema concreto de un juego en concreto.
