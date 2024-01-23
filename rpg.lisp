@@ -8,7 +8,9 @@
                                  (("do" "d") . rpg/do)))
 
 (defun main (args)
-  (when (null args) (return-from main))
+  (when (null args)
+    (rpg/repl-startup)
+    (return-from main))
   (let ((f (cdr (assoc (car args) *valid-commands*
                        :test (lambda (key item)
                                (member key item :test 'string=))))))
@@ -32,14 +34,15 @@
 (defun require-game (game)
   "Carga el contenido del juego si no lo estaba ya."
   (let ((%f (concatenate 'string game ".lisp")))
-    (if (and (null (gethash game *loaded-games*))
-             (probe-file %f))
-        (progn
-          (load %f)
-          (setf (gethash game *loaded-games*) *last-loaded-data*))
-      (progn
-        (format t "[!] No se han podido cargar los datos del juego ~A: Achivo ~A no encontrado.~%" game %f)
-        nil))))
+    (if (null (gethash game *loaded-games*))
+        (if (probe-file %f)
+            (progn
+              (load %f)
+              (setf (gethash game *loaded-games*) *last-loaded-data*))
+          (progn
+            (format t "[!] No se han podido cargar los datos del juego ~A: Achivo ~A no encontrado.~%" game %f)
+            nil))
+      t)))
 
 (defun delimiter-split (delimiter sequence
                                   &key (keep-delimiters nil)
@@ -152,7 +155,8 @@
   ;; codigo
   (let* ((game-data (gethash game *loaded-games*))
          (thing (gethash topic game-data)))
-    (setf (gethash identifier *active-things*) thing)))
+    (setf (gethash identifier *active-things*) thing))
+  (format t "Nueva intancia (~A) de ~A creada." identifier topic))
 
 (defun rpg/do (&optional action identifier &rest rest)
   "Hacer una acción sobre una instancia. Para uso en el REPL."
