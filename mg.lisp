@@ -6,13 +6,21 @@
 
 (defclass animal ()
   ((name
-    :initarg :name)
+    :initarg :name
+    :type string
+    :accessor mg/animal.name)
    (nature
-    :initarg :nature)
+    :initarg :nature
+    :type fixnum
+    :accessor mg/animal.nature)
    (aspects
-    :initarg :aspects)
+    :initarg :aspects
+    :type list
+    :accessor mg/animal.aspects)
    (description
-    :initarg :description)))
+    :initarg :desc
+    :type string
+    :accessor mg/animal.desc)))
 
 (defmacro add-animal (name nature aspects description)
   (setf (gethash name *mg-data*)
@@ -20,15 +28,15 @@
                        :name name
                        :nature nature
                        :aspects aspects
-                       :description description)))
+                       :desc description)))
 
 (defmethod print-thing ((thing animal))
            (format t "- ~A -~%~A~%~%Naturaleza ~A ~D~%~{~A~^, ~}~%"
-                   (slot-value thing 'name)
-                   (slot-value thing 'description)
-                   (slot-value thing 'name)
-                   (slot-value thing 'nature)
-                   (slot-value thing 'aspects)))
+                   (mg/animal.name thing)
+                   (mg/animal.desc thing)
+                   (mg/animal.name thing)
+                   (mg/animal.nature thing)
+                   (mg/animal.aspects thing)))
 
 ;; Instancias en la tabla
 
