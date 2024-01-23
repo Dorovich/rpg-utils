@@ -1,6 +1,8 @@
+;;; DATOS DE MOUSE GUARD
+
 (defparameter *mg-data* (make-hash-table :test 'equalp))
 
-;; Definitions
+;; Definiciones
 
 (defclass animal ()
   ((name
@@ -28,7 +30,7 @@
                    (slot-value thing 'nature)
                    (slot-value thing 'aspects)))
 
-;; Animal instances
+;; Instancias en la tabla
 
 (add-animal "Coyote" 8 ("Inteligente" "Adaptable" "Impredecible" "Tenaz")
             "Más allá de las Fronteras Olfativas acecha un gran múmero de animales peligrosos. Motivados por la escasez durente el largo invierno, a veces los coyotes hacen incursiones hasta los Territorios en busca de comida.
@@ -37,6 +39,6 @@ Los coyotes son más grandes que los zorros, pero no tan grandes como los lobos.
 (add-animal "Abeja" 2 ("Zumbar" "Recoger Polen" "Moverse en Enjambre")
             "Las abejas habitan dentro de sus colmenas, de cuyo interior los apicultores recogen miel y cera.")
 
-;; End
+;; Final
 
 (setf *last-loaded-data* *mg-data*)

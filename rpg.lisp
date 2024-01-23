@@ -61,7 +61,7 @@
 ;; Funciones de interfaz
 
 (defun rpg/repl ()
-  "Invoca un REPL. Por si se quieren poner muchos comandos a la vez."
+  "Invoca un REPL. Por si se quieren poner muchos comandos a la vez o trabajar con instancias."
   (let ((cmd (prompt-read ">")))
     (unless (string= cmd "exit")
       (main (delimiter-split #\Space cmd))
@@ -134,7 +134,7 @@
     (print-thing thing)))
 
 (defun rpg/new (&optional game topic identifier &rest rest)
-  "Crear una instancia de un tema para usar en otros comandos. Para uso en el REPL."
+  "Crear una instancia (con nuevo identificador) para usar en otros comandos. Para uso en el REPL."
   ;; errores?
   (unless *in-repl*
     (format t "[!] Las instancias se eliminan cuando el programa finaliza. Para trabajar con ellas usa el REPL: ./rpg repl~%")
