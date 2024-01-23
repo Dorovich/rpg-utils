@@ -79,7 +79,9 @@
   (handler-case
       (rpg/repl)
     (sb-sys:interactive-interrupt () (sb-ext:exit :code 1))
-    (error (c) (sb-ext:exit :code 1))))
+    (error (c)
+           (format t "[!] Ha ocurrido un error:~%~A~%~%Saliendo.~%" c)
+           (sb-ext:exit :code 1))))
 
 (defun rpg/roll (&optional expr &rest rest)
   "Tirar dados según la expresión XdY (X = cantidad, Y = caras) y calcular la suma de los resultados."
