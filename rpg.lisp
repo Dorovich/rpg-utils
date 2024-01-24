@@ -7,6 +7,7 @@
                                  (("new" "n") . rpg/new)
                                  (("do" "d") . rpg/do)))
 
+(declaim (ftype (function (list) string) main))
 (defun main (args)
   (when (null args)
     (rpg/repl-startup)
@@ -20,9 +21,6 @@
 
 ;; Funciones de utilidad
 
-(require :uiop)
-(require :sb-posix)
-
 (defparameter *loaded-games* (make-hash-table :test 'equal))
 (defparameter *last-loaded-data* nil)
 
@@ -31,19 +29,25 @@
 
 (defgeneric print-thing (thing))
 
+(declaim (ftype (function (string) t) require-game))
 (defun require-game (game)
   "Carga el contenido del juego si no lo estaba ya."
-  (let ((%f (concatenate 'string game ".lisp")))
+  (let ((%fc (concatenate 'string game ".fasl"))
+	(%f (concatenate 'string game ".lisp")))
     (if (null (gethash game *loaded-games*))
-        (if (probe-file %f)
-            (progn
-              (load %f)
-              (setf (gethash game *loaded-games*) *last-loaded-data*))
-          (progn
-            (format t "[!] No se han podido cargar los datos del juego ~A: Achivo ~A no encontrado.~%" game %f)
-            nil))
+      (cond
+	((probe-file %fc)
+	 (load %fc)
+	 (setf (gethash game *loaded-games*) *last-loaded-data*))
+	((probe-file %f)
+	 (load %f)
+	 (setf (gethash game *loaded-games*) *last-loaded-data*))
+	(t
+	  (format t "[!] No se han podido cargar los datos del juego ~A: Achivo ~A no encontrado.~%" game %f)
+	  nil))
       t)))
 
+(declaim (ftype (function (character string) list) delimiter-split))
 (defun delimiter-split (delimiter sequence
                                   &key (keep-delimiters nil)
                                   &aux (end (length sequence)))
@@ -55,6 +59,7 @@
         when (> pos start) collect (subseq sequence start pos) ; some content found
         when keep-delimiters collect (subseq sequence pos (1+ pos)))) ; optionally keep delimiter
 
+(declaim (ftype (function (string) string) prompt-read))
 (defun prompt-read (&optional prompt)
   (when prompt
     (format *query-io* "~A " prompt)
@@ -63,6 +68,7 @@
 
 ;; Funciones de interfaz
 
+(declaim (ftype (function () t) rpg/repl))
 (defun rpg/repl ()
   "Invoca un REPL. Por si se quieren poner muchos comandos a la vez o trabajar con instancias."
   (let ((cmd (prompt-read ">")))
@@ -70,6 +76,7 @@
       (main (delimiter-split #\Space cmd))
       (rpg/repl))))
 
+(declaim (ftype (function (&rest string) t) rpg/repl-startup))
 (defun rpg/repl-startup (&rest rest)
   "Prepara el entorno del REPL y captura cualquier error o interrupción que haya mientras se ejecuta."
   ;; errores?
@@ -86,6 +93,7 @@
            (format t "[!] Ha ocurrido un error:~%~A~%~%Saliendo.~%" c)
            (sb-ext:exit :code 1))))
 
+(declaim (ftype (function (string &rest string) t) rpg/roll))
 (defun rpg/roll (&optional expr &rest rest)
   "Tirar dados según la expresión XdY (X = cantidad, Y = caras) y calcular la suma de los resultados."
   ;; errores?
@@ -105,6 +113,7 @@
           do (incf result (+ 1 (random faces))))
     (format t "~Dd~D => ~D~%" times faces result)))
 
+(declaim (ftype (function (string &rest string) t) rpg/coin))
 (defun rpg/coin (&optional times &rest rest)
   "Tirar X cantidad de monedas y hacer recuendo de la cantidad de caras y cruces."
   ;; errores?
@@ -125,6 +134,7 @@
                (incf heads)))
     (format t "~D monedas => ~D caras, ~D cruces~%" times heads tails)))
 
+(declaim (ftype (function (string string &rest string) t) rpg/info))
 (defun rpg/info (&optional game topic &rest rest)
   "Buscar información sobre un tema concreto de un juego en concreto."
   ;; errores?
@@ -138,6 +148,7 @@
          (thing (gethash topic game-data)))
     (print-thing thing)))
 
+(declaim (ftype (function (string string string &rest string) t) rpg/new))
 (defun rpg/new (&optional game topic identifier &rest rest)
   "Crear una instancia (con nuevo identificador) para usar en otros comandos. Para uso en el REPL."
   ;; errores?
@@ -158,6 +169,7 @@
     (setf (gethash identifier *active-things*) thing))
   (format t "Nueva intancia (~A) de ~A creada." identifier topic))
 
+(declaim (ftype (function (string string &rest string) t) rpg/do))
 (defun rpg/do (&optional action identifier &rest rest)
   "Hacer una acción sobre una instancia. Para uso en el REPL."
   ;; errores?
@@ -176,4 +188,4 @@
 
 ;; Inicio del programa
 
-(main uiop:*command-line-arguments*)
+(main (cdr sb-ext:*posix-argv*))
