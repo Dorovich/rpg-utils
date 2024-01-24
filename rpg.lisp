@@ -1,11 +1,14 @@
 ;; Funciones principales
 
 (defparameter *valid-commands* '((("repl") . rpg/repl-startup)
-                                 (("roll" "r") . rpg/roll)
-                                 (("coin" "c") . rpg/coin)
-                                 (("info" "i") . rpg/info)
-                                 (("new" "n") . rpg/new)
-                                 (("do" "d") . rpg/do)))
+				 (("roll" "r") . rpg/roll)
+				 (("coin" "c") . rpg/coin)
+				 (("info" "i") . rpg/info)
+				 (("new" "n") . rpg/new)
+				 (("do" "d") . rpg/do)))
+
+(defparameter *valid-actions* '((("print" "p") . print-thing)
+				(("generate" "g") . generate-thing)))
 
 (declaim (ftype (function (list) string) main))
 (defun main (args)
@@ -13,10 +16,10 @@
     (rpg/repl-startup)
     (return-from main))
   (let ((f (cdr (assoc (car args) *valid-commands*
-                       :test (lambda (key item)
-                               (member key item :test 'string=))))))
+		       :test (lambda (key item)
+			       (member key item :test 'string=))))))
     (if f
-        (apply f (cdr args))
+      (apply f (cdr args))
       (format t "[!] El comando ~A no existe.~%" (car args)))))
 
 ;; Funciones de utilidad
@@ -49,15 +52,15 @@
 
 (declaim (ftype (function (character string) list) delimiter-split))
 (defun delimiter-split (delimiter sequence
-                                  &key (keep-delimiters nil)
-                                  &aux (end (length sequence)))
+				  &key (keep-delimiters nil)
+				  &aux (end (length sequence)))
   (loop for start = 0 then (1+ pos)
-        for pos   = (position delimiter sequence :start start)
-        when (and (null pos) (not (= start end))) ; no more delimiter found
-        collect (subseq sequence start)
-        while pos ; while delimiter found
-        when (> pos start) collect (subseq sequence start pos) ; some content found
-        when keep-delimiters collect (subseq sequence pos (1+ pos)))) ; optionally keep delimiter
+	for pos   = (position delimiter sequence :start start)
+	when (and (null pos) (not (= start end))) ; no more delimiter found
+	collect (subseq sequence start)
+	while pos ; while delimiter found
+	when (> pos start) collect (subseq sequence start pos) ; some content found
+	when keep-delimiters collect (subseq sequence pos (1+ pos)))) ; optionally keep delimiter
 
 (declaim (ftype (function (string) string) prompt-read))
 (defun prompt-read (&optional prompt)
@@ -87,11 +90,11 @@
   (setf *in-repl* t)
   (setf *active-things* (make-hash-table :test 'equal))
   (handler-case
-      (rpg/repl)
+    (rpg/repl)
     (sb-sys:interactive-interrupt () (sb-ext:exit :code 1))
     (error (c)
-           (format t "[!] Ha ocurrido un error:~%~A~%~%Saliendo.~%" c)
-           (sb-ext:exit :code 1))))
+	   (format t "[!] Ha ocurrido un error:~%~A~%~%Saliendo.~%" c)
+	   (sb-ext:exit :code 1))))
 
 (declaim (ftype (function (string &rest string) t) rpg/roll))
 (defun rpg/roll (&optional expr &rest rest)
@@ -105,12 +108,12 @@
     (return-from rpg/roll))
   ;; codigo
   (let* ((nums (delimiter-split #\d expr))
-         (times (parse-integer (car nums)))
-         (faces (parse-integer (cadr nums)))
-         (result 0))
+	 (times (parse-integer (car nums)))
+	 (faces (parse-integer (cadr nums)))
+	 (result 0))
     (setf *random-state* (make-random-state t))
     (loop repeat times
-          do (incf result (+ 1 (random faces))))
+	  do (incf result (+ 1 (random faces))))
     (format t "~Dd~D => ~D~%" times faces result)))
 
 (declaim (ftype (function (string &rest string) t) rpg/coin))
@@ -125,13 +128,13 @@
     (return-from rpg/coin))
   ;; codigo
   (let ((heads 0)
-        (tails 0))
+	(tails 0))
     (setf times (parse-integer times))
     (setf *random-state* (make-random-state t))
     (loop repeat times
-          do (if (= (random 2) 0)
-                 (incf tails)
-               (incf heads)))
+	  do (if (= (random 2) 0)
+	       (incf tails)
+	       (incf heads)))
     (format t "~D monedas => ~D caras, ~D cruces~%" times heads tails)))
 
 (declaim (ftype (function (string string &rest string) t) rpg/info))
@@ -145,7 +148,7 @@
     (return-from rpg/info))
   ;; codigo
   (let* ((game-data (gethash game *loaded-games*))
-         (thing (gethash topic game-data)))
+	 (thing (gethash topic game-data)))
     (print-thing thing)))
 
 (declaim (ftype (function (string string string &rest string) t) rpg/new))
@@ -165,9 +168,9 @@
     (return-from rpg/new))
   ;; codigo
   (let* ((game-data (gethash game *loaded-games*))
-         (thing (gethash topic game-data)))
+	 (thing (gethash topic game-data)))
     (setf (gethash identifier *active-things*) thing))
-  (format t "Nueva intancia (~A) de ~A creada." identifier topic))
+  (format t "Nueva intancia (~A) de ~A creada.~%" identifier topic))
 
 (declaim (ftype (function (string string &rest string) t) rpg/do))
 (defun rpg/do (&optional action identifier &rest rest)
@@ -184,7 +187,7 @@
     (return-from rpg/do))
   ;; codigo
   (if (string= action "print")
-      (print-thing (gethash identifier *active-things*))))
+    (print-thing (gethash identifier *active-things*))))
 
 ;; Inicio del programa
 
