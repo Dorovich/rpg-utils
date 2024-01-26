@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec guile -e main -s rpg.scm $@
