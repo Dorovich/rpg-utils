@@ -62,10 +62,13 @@
       (rpg/repl))))
 
 (define (rpg/repl-startup)
-  (set! in-repl #t)
-  (with-exception-handler
-    (lambda (e) (exit 1))
-    (rpg/repl)))
+  (if (not in-repl)
+    (begin
+      (set! in-repl #t)
+      (with-exception-handler
+	(lambda (e) (exit 1))
+	(rpg/repl)))
+    (format #t "[!] El REPL ya está activo.~%")))
 
 (define (rpg/roll expr)
   (let* ((nums (string-split is-d? expr))

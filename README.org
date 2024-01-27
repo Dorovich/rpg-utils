@@ -1,6 +1,15 @@
 * RPG-UTILS
 Un conjunto de funciones para facilitar partidas de juegos de rol clásicos.
 
+* Instalación
+Por el momento he implementado las funcionalidades del programa en dos lenguajes diferentes: *Common Lisp* y (Guile) *Scheme*. Dependiendo de qué sistema uses recomiendo una u otra:
++ Windows: la implementación en Common Lisp (en la carpeta =cl=) es la más conveniente. También puedes usar Cygwin o WSL para ejecutar el programa en Scheme.
++ Tipo Unix: la implementación en Scheme (en la carpeta =scm=) es la que he comprobado que es más rápida, pero la diferencia es muy sutil. Usa cualquiera de las dos versiones.
+
+Para poder ejecutar los programas necesitarás compiladores del lenguaje correspondiente:
++ Common Lisp: recomiendo [[https://sbcl.org/][SBCL]], es el que he usado. No aseguro que el programa funcione con otro compilador.
++ Scheme: recomiendo [[https://www.gnu.org/software/guile/][Guile]], porque es la que he usado y dudo que otro funcione.
+
 *  Uso
  #+BEGIN_SRC sh
    ./rpg [repl] [roll|r <dice expr>] [coin|c <times>] [info|i <game> <topic>] [new|n <game> <topic> <id>] [do|d <action> <id>]
@@ -12,3 +21,5 @@ Un conjunto de funciones para facilitar partidas de juegos de rol clásicos.
  + =info= / =i=: Buscar información sobre un tema concreto de un juego en concreto.
  + =new= / =n=: Crear una instancia (con nuevo identificador) para usar en otros comandos. Para uso en el REPL.
  + =do= / =d=: Hacer una acción sobre una instancia. Para uso en el REPL.
+
+ Nota: las abreviaciones de los comandos están disponibles sólo en la implementación en Common Lisp (de momento).
