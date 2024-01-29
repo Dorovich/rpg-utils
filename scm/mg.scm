@@ -10,6 +10,10 @@
      name)
     ((get-nature)
      nature)
+    ((set-nature nat)
+     (format #t "Naturaleza modificada: ~a -> ~a~%" nature nat)
+     ;; esto modifica el valor de naturaleza global del animal :(
+     (set! nature (string->number nat)))
     ((describe)
      (format #t "[ ~a ]~%~a~%"
 	     name desc)

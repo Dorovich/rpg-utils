@@ -112,20 +112,22 @@
       (format #t "Nueva instancia de ~a creada (~a).~%" topic identifier))
     (format #t "[!] Las instancias se eliminan cuando el programa finaliza. Para trabajar con ellas usa el REPL: ./rpg repl~%")))
 
-(define (rpg/do action identifier)
+(define* (rpg/do action identifier #:optional arg)
   (if in-repl
     (let ((thing (hash-ref active-things identifier)))
-      (thing (string->symbol action)))
+      (if arg
+	(thing (string->symbol action) arg)
+	(thing (string->symbol action))))
     (format #t "[!] Las instancias se eliminan cuando el programa finaliza. Para trabajar con ellas usa el REPL: ./rpg repl~%")))
 
 ;; Funciones principales
 
-(define valid-commands `(("repl" ,rpg/repl-startup . 0)
-			 ("roll" ,rpg/roll . 1)
-			 ("coin" ,rpg/coin . 1)
-			 ("info" ,rpg/info . 2)
-			 ("new" ,rpg/new . 3)
-			 ("do" ,rpg/do . 2)))
+(define valid-commands `(("repl" ,rpg/repl-startup . (0))
+			 ("roll" ,rpg/roll . (1))
+			 ("coin" ,rpg/coin . (1))
+			 ("info" ,rpg/info . (2))
+			 ("new" ,rpg/new . (3))
+			 ("do" ,rpg/do . (2 3))))
 
 (define (main args)
   (if (not in-repl)
@@ -138,7 +140,7 @@
 	(begin
 	  (let ((func (car entry))
 		(nargs (cdr entry)))
-	    (if (= nargs (length (cdr args)))
+	    (if (member (length (cdr args)) nargs)
 	      (apply func (cdr args))
 	      (format #t "[!] Número de argumentos incorrecto.~%"))))
 	(format #t "[!] El comando ~a no existe.~%" cmd)))))
