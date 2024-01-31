@@ -3,12 +3,15 @@
 
 (set! *random-state* (random-state-from-platform))
 
+(define data-folder (string-append (getenv "HOME") "/Programas/Lisp/rpg/scm/"))
+
 ;; Funciones de utilidad
 
 (define in-repl #f)
 (define loaded-games (make-hash-table 3))
 (define last-loaded-data #f)
 (define active-things (make-hash-table))
+(define in-game #f)
 
 (define (string-split char-delimiter? string)
   (define (maybe-add a b parts)
@@ -27,7 +30,7 @@
   (if (eq? char #\d) #t #f))
 
 (define (require-game game)
-  (let ((file (string-append game ".scm")))
+  (let ((file (string-append data-folder game ".scm")))
     (if (not (hash-ref loaded-games game))
       (if (file-exists? file)
 	(begin
@@ -39,17 +42,26 @@
 	  #f))
       #t)))
 
+(define-syntax check-game
+  (syntax-rules ()
+    ((check-game game)
+     (cond
+       (game (require-game game))
+       (in-game (set! game in-game))
+       (else (format #t "[!] No se ha especificado un juego por defecto.~%")
+	     #f)))))
+
 (define-syntax-rule (methods ((method-id method-args ...)
 			      body ...) ...)
-		    (lambda (method . args)
-		      (letrec ((method-id
-				 (lambda (method-args ...)
-				   body ...)) ...)
-			(cond
-			  ((eq? method (quote method-id))
-			   (apply method-id args)) ...
-			  (else
-			    (error "No such method:" method))))))
+  (lambda (method . args)
+    (letrec ((method-id
+	       (lambda (method-args ...)
+		 body ...)) ...)
+      (cond
+	((eq? method (quote method-id))
+	 (apply method-id args)) ...
+	(else
+	  (error "No such method:" method))))))
 
 ;; Funciones de interfaz
 
@@ -97,14 +109,16 @@
 	(format #t "~d monedas => ~d caras, ~d cruces~%" times heads tails))
       (format #t "[!] Expresión cantidad malformada.~%"))))
 
-(define (rpg/info game topic)
-  (when (require-game game)
+(define* (rpg/info topic #:optional game)
+  (when (check-game game)
     (let* ((game-data (hash-ref loaded-games game))
 	   (thing (hash-ref game-data topic)))
-      (thing 'describe))))
+      (if thing
+	(thing 'describe)
+	(format #t "No existe \"~a\" en el juego ~a.~%" topic game)))))
 
-(define (rpg/new game topic identifier)
-  (if (and in-repl (require-game game))
+(define* (rpg/new topic identifier #:optional game)
+  (if (and in-repl (check-game game))
     (begin
       (let* ((game-data (hash-ref loaded-games game))
 	     (thing (hash-ref game-data topic)))
@@ -120,14 +134,22 @@
 	(thing (string->symbol action))))
     (format #t "[!] Las instancias se eliminan cuando el programa finaliza. Para trabajar con ellas usa el REPL: ./rpg repl~%")))
 
+(define (rpg/ingame game)
+  (if (string= game "none")
+    (set! in-game #f)
+    (when (require-game game)
+      (set! in-game game)
+      (format #t "Seleccionando ~a como juego por defecto.~%" game))))
+
 ;; Funciones principales
 
 (define valid-commands `(("repl" ,rpg/repl-startup . (0))
 			 ("roll" ,rpg/roll . (1))
 			 ("coin" ,rpg/coin . (1))
-			 ("info" ,rpg/info . (2))
-			 ("new" ,rpg/new . (3))
-			 ("do" ,rpg/do . (2 3))))
+			 ("info" ,rpg/info . (1 2))
+			 ("new" ,rpg/new . (2 3))
+			 ("do" ,rpg/do . (2 3))
+			 ("ingame" ,rpg/ingame . (1))))
 
 (define (main args)
   (if (not in-repl)
