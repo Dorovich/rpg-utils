@@ -91,7 +91,7 @@
       (begin
 	(do ((i 1 (1+ i)))
 	  ((> i times))
-	  (set! result (+ result (random faces))))
+	  (set! result (+ result (+ 1 (random faces)))))
 	(format #t "~dd~d => ~d~%" times faces result))
       (format #t "[!] Expresión de los dados malformada.~%"))))
 
